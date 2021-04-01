@@ -46,10 +46,9 @@ app.use(express.urlencoded({extended:true}))
 
 
 
-const {checkEmail,addUser,login,checkUsername,updatePassword,updateUrl} =require('./db/users.js');
-const {addUrl,getFullUrl,getAllUrl}=require('./db/urls.js');
-const {generateShort}=require('./utilities/short_id_generator.js');
-
+const {checkEmail,addUser,login,checkUsername,updatePassword} =require('./db/users.js');
+const { addIncome,getIncomes,checkUpdateIncome,updateIcomeAmount,updateIncomeDescription }=require('./db/incomes.js');
+const {addExpense,updateExpenseAmount,updateExpenseCategory,updateExpenseDescription,updateExpenseDivision,checkUpdateExpense,getExpense}=require('./db/expenditures.js');
 
 app.post('/register',async(req,res)=>{
     try{
@@ -242,91 +241,102 @@ app.put('/forgot_password/:encrypted_mail',async(req,res)=>{
     }
 })
 
-app.post('/generate',async(req,res)=>{
-    try{
-        let access_token=req.headers.authorization;
-        let decoded=await jwt.verify(access_token,process.env.KEY);
-        if(decoded)
-        {
-            let email=decoded.email;
-            let full=req.body.full;
-            let short=await generateShort();
-            await addUrl(short,full,email,checkEmail,updateUrl);
-            res.status(201).json(
-                {
-                    new_url:req.get("host")+'/'+short
-                }
-            )
-        }
-        else
-        {
-            res.status(401).json({
-                message:"Session Expired,Please Login Again!"
-            })
-        }
-
-    }
-    catch(err)
-    {
-        res.status(500).json({
-            message:err.message
-        })
-    }
-})
-app.post('/getallurl/:offset',async(req,res)=>{
-    try{
-        let access_token=req.headers.authorization;
-        let decoded=await jwt.verify(access_token,process.env.KEY);
-        if(decoded)
-        {
-            let offset=req.params.offset;
-            let user=await checkEmail(decoded.email);
-           
-            let data=await getAllUrl(user.urls,offset);
-        
-            res.status(200).json({
-                data:data.result,
-                next:data.next,
-                prev:data.prev
-
-            })
-
-        }
-        else
-        {
-            res.status(401).json({
-                message:"Session Expired,Please Login Again!"
-            })
-        }
-        
-
-    }
-    catch(err)
-    {
-        res.status(500).json({
-            message:err.message
-        })
-    }
-})
 
 app.get('/verify_token&get_user_details',async(req,res)=>{
     try{
         let access_token=req.headers.authorization;
         let decoded=await jwt.verify(access_token,process.env.KEY);
-        if(decoded)
+        res.status(200).json(
+            {
+                data:decoded
+            }
+        )
+
+    }
+    catch(err)
+    {
+        res.status(500).json({
+            message:err.message
+        })
+    }
+
+})
+
+app.get("/get_income/:from/:to",async(req,res)=>{
+    try{
+        let decoded=await jwt.verify(req.headers.authorization,process.env.KEY);
+        let from=req.params.from;
+        let to=req.params.to;
+        let filter=null;
+        if(from!=0)
         {
-            res.status(200).json(
-                {
-                    data:decoded
-                }
-            )
+            filter={
+                from:new Date(from)
+            }
+            if(to!=0)
+            {
+                filter.to=new Date(to)
+            }
+            
+        }
+        const data=await getIncomes(filter);
+        res.status(200).json({
+            data
+        })
+    }
+    catch(err)
+    {
+        res.status(500).json({
+            message:err.message
+        })
+    }
+})
+
+app.post('/add_income',async(req,res)=>{
+    try{
+        let decoded=await jwt.verify(req.headers.authorization,process.env.KEY);
+        let amount=req.body.amount;
+        let description=req.body.description;
+        let email=decoded.email;
+        let date=req.body.date;
+        await addIncome(amount,description,email,date);
+        res.status(201).json({
+            message:"New Income Added !!" 
+        })
+    }
+    catch(err)
+    {
+        res.status(500).json({
+            message:err.message
+        })
+    }
+})
+
+app.put('/update_income',async(req,res)=>{
+    try{
+        let decoded=await jwt.verify(req.headers.authorization,process.env.KEY);
+        let check=await checkUpdateIncome(req.body.id);
+        if(check)
+        {
+            if(req.body.amount)
+            {
+                await updateIcomeAmount(req.body.amount,req.body.id);
+            }
+            if(req.body.description)
+            {
+                await updateIncomeDescription(req.body.description,req.body.id);
+            }
+            res.status(201).json({
+                message:"Updated !!"
+            })
         }
         else
         {
-            res.status(401).json({
-                message:"Session Expired,Please Login Again!"
+            res.json({
+                message:"Your time to update this income is expired!"
             })
         }
+        
 
     }
     catch(err)
@@ -335,14 +345,20 @@ app.get('/verify_token&get_user_details',async(req,res)=>{
             message:err.message
         })
     }
-
 })
 
-app.get('/:short',async(req,res)=>{
+app.post('/add_expense',async(req,res)=>{
     try{
-        let short=req.params.short;
-        let full=await getFullUrl(short);
-        res.status(200).redirect(full);
+        let decoded=await jwt.verify(req.headers.authorization,process.env.KEY);
+        let amount=req.body.amount;
+        let description=req.body.description;
+        let division=req.body.division;
+        let category=req.body.category;
+        let date=req.body.date;
+        await addExpense(amount,description,division,category,decoded.email,date);
+        res.status(201).json({
+            message:"New expenditure added !!"
+        })
     }
     catch(err)
     {
@@ -350,11 +366,91 @@ app.get('/:short',async(req,res)=>{
             message:err.message
         })
     }
-
 })
 
+app.get('/get_expense/:from/:to/:category/:division',async(req,res)=>{
+    try{
+        let decoded=await jwt.verify(req.headers.authorization,process.env.KEY)
+        let from=req.params.from;
+        let to=req.params.to;
+        let category=req.params.category;
+        let division=req.params.division;
+        let filter={};
+        if(from!=0)
+        {
+            filter.from=from;
+            if(to!=0)
+            {
+                filter.to=to;
+            }
+        }
+        if(category!=0)
+        {
+            filter.category=category;
+        }
+        if(division!=0)
+        {
+            filter.division=division;
+        }
+        if(Object.keys(filter).length===0)
+        {
+            filter=null;
+        }
+        const data=await getExpense(filter);
+        res.status(200).json({
+            data
+        })
+    }
+    catch(err)
+    {
+        res.status(500).json({
+            message:err.message
+        })
+    }
+})
 
+app.put('/update_expense',async(req,res)=>{
+    try{
+        let decoded=await jwt.verify(req.headers.authorization,process.env.KEY);
+        let check=await checkUpdateExpense(req.body.id);
+        if(check)
+        {
+            if(req.body.amount)
+            {
+                await updateExpenseAmount(req.body.amount,req.body.id);
+            }
+            if(req.body.description)
+            {
+                await updateExpenseDescription(req.body.description,req.body.id);
+            }
+            if(req.body.category)
+            {
+                await updateExpenseCategory(req.body.category,req.body.id);
+            }
+            if(req.body.division)
+            {
+                await updateExpenseDivision(req.body.division,req.body.id);
+            }
+            res.status(201).json({
+                message:"Updated !!"
+            })
+        }
+        else
+        {
+            res.json({
+                message:"Your time to update this income is expired!"
+            })
+        }
+        
 
+    }
+    catch(err)
+    {
+        res.status(500).json({
+            message:err.message
+        })
+    }
+})
 
 app.listen(PORT,()=>{
     console.log("SERVER STARTED",PORT)

@@ -1,7 +1,6 @@
 {
   "name": "user_authentication_backend",
   "version": "1.0.0",
-  "description": "",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -19,5 +18,15 @@
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.6.5",
     "nodemailer": "^6.5.0"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sahilalam/Url_shortner_backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sahilalam/Url_shortner_backend/issues"
+  },
+  "homepage": "https://github.com/sahilalam/Url_shortner_backend#readme",
+  "description": ""
 }

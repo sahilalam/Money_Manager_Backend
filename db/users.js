@@ -29,7 +29,8 @@ let addUser=async(name,password,email)=>{
         const db=await clientInfo.db(db_name);
         const data = await db.collection(users_collection).insertOne({
             name,password,email,
-            urls:[]
+            incomes:[],
+            expenses:[]
         })
         clientInfo.close();
     }
@@ -83,12 +84,33 @@ let updatePassword=async(email,password)=>{
         throw err;
     }
 }
-let updateUrl=async(email,urls)=>{
+let addIncomeUser=async(id,email)=>{
     try{
         const clientInfo=await mongoClient.connect(db_url);
         const db=await clientInfo.db(db_name);
-        const data=await db.collection(users_collection).updateOne({"email":{$eq:email}},{$set:{"urls":urls}});
+        const data=await db.collection(users_collection).findOne({"email":{$eq:email}});
+        const incomes=[...data.incomes];
+        incomes.push(id);
+        await db.collection(users_collection).updateOne({"email":{$eq:email}},{$set:{"incomes":incomes}});
         clientInfo.close();
+
+    }
+    catch(err)
+    {
+        throw err;
+    }
+}
+
+let addExpenseUser=async(id,email)=>{
+    try{
+        const clientInfo=await mongoClient.connect(db_url);
+        const db=await clientInfo.db(db_name);
+        const data=await db.collection(users_collection).findOne({"email":{$eq:email}});
+        const expenses=[...data.expenses];
+        expenses.push(id);
+        await db.collection(users_collection).updateOne({"email":{$eq:email}},{$set:{"expenses":expenses}});
+        clientInfo.close();
+
     }
     catch(err)
     {
@@ -97,5 +119,5 @@ let updateUrl=async(email,urls)=>{
 }
 
 module.exports={
-    checkEmail,addUser,login,checkUsername,updatePassword,updateUrl
+    checkEmail,addUser,login,checkUsername,updatePassword,addIncomeUser,addExpenseUser
 }

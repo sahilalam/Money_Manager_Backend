@@ -98,9 +98,10 @@ let getExpense=async(filter,email)=>
         let data=await db.collection(expenditures_collection).find({$and:f}).sort({'date':-1}).toArray();
         data=await data.map(async(d)=>{
             try{
+                let result={...d};
                 const check=await checkUpdateExpense(d._id);
-                d.check=check;
-                return d;
+                result.check=check;
+                return result;
             }
             catch(err)
             {

@@ -75,9 +75,10 @@ let getIncomes=async(filter,email)=>{
         let data=await db.collection(incomes_collection).find({$and:[{"_id":{$in:incomes}},{"date":{$lte:to,$gte:from}}]}).sort({'date':-1}).toArray();
         data=data.map(async(d)=>{
             try{
+                let result={...d};
                 const check=await checkUpdateIncome(d._id);
-                d.check=check;
-                return d;
+                result.check=check;
+                return result;
             }
             catch(err)
             {

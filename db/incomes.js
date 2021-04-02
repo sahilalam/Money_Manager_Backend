@@ -30,9 +30,6 @@ let getIncomes=async(filter,email)=>{
         const db=await client.db(db_name);
         const user=await checkEmail(email);
         let incomes=user.incomes;
-        incomes=incomes.map((id)=>{
-            return new objectId(id);
-        })
         let from,to;
         if(filter)
         {

@@ -95,7 +95,19 @@ let getExpense=async(filter,email)=>
             })
         }
 
-        const data=await db.collection(expenditures_collection).find({$and:f}).sort({'date':-1}).toArray();
+        let data=await db.collection(expenditures_collection).find({$and:f}).sort({'date':-1}).toArray();
+        data=await data.map((d)=>{
+            try{
+                const check=await checkUpdateExpense(d._id);
+                d.check=check;
+                return d;
+            }
+            catch(err)
+            {
+                throw err;
+                console.log(err);
+            }
+        })
 
         client.close();
         return data;

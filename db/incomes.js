@@ -24,6 +24,28 @@ let addIncome=async(amount,description,email,date)=>{
     }
 
 }
+let checkUpdateIncome=async(id)=>{
+    try{
+        const client=await mongoClient.connect(db_url);
+        const db=await client.db(db_name);
+        id=new objectId(id);
+        const data=await db.collection(incomes_collection).findOne({"_id":id});
+        client.close();
+        const date=data.date;
+        let now=new Date();
+
+        if(now-date<43200000)
+        {
+            return true;
+        }
+        return false;
+    }
+    catch(err)
+    {
+        throw err;
+    }
+
+}
 let getIncomes=async(filter,email)=>{
     try{
         const client=await mongoClient.connect(db_url);
@@ -50,7 +72,19 @@ let getIncomes=async(filter,email)=>{
             from=to-7776000000;
             from=new Date(from);
         }
-        const data=await db.collection(incomes_collection).find({$and:[{"_id":{$in:incomes}},{"date":{$lte:to,$gte:from}}]}).sort({'date':-1}).toArray();
+        let data=await db.collection(incomes_collection).find({$and:[{"_id":{$in:incomes}},{"date":{$lte:to,$gte:from}}]}).sort({'date':-1}).toArray();
+        data=data.map(async(d)=>{
+            try{
+                const check=await checkUpdateIncome(d._id);
+                d.check=check;
+                return d;
+            }
+            catch(err)
+            {
+                throw err;
+                console.log(err);
+            }
+        })
         client.close();
     return data;
     }
@@ -60,28 +94,7 @@ let getIncomes=async(filter,email)=>{
     }
 
 }
-let checkUpdateIncome=async(id)=>{
-    try{
-        const client=await mongoClient.connect(db_url);
-        const db=await client.db(db_name);
-        id=new objectId(id);
-        const data=await db.collection(incomes_collection).findOne({"_id":id});
-        client.close();
-        const date=data.date;
-        let now=new Date();
 
-        if(now-date<43200000)
-        {
-            return true;
-        }
-        return false;
-    }
-    catch(err)
-    {
-        throw err;
-    }
-
-}
 let updateIcomeAmount=async(amount,id)=>{
     try{
         const client=await mongoClient.connect(db_url);

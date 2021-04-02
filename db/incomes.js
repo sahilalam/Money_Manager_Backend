@@ -34,7 +34,12 @@ let checkUpdateIncome=async(id)=>{
         client.close();
         let date=data.date;
         date=new Date(date)-0;
-        let now=new Date()+2052000;
+        let now=new Date();
+        now=now.getTime() ;
+        now=new Date(now);
+        now.setHours(now.getHours() + 5); 
+        now.setMinutes(now.getMinutes() + 30);
+        now=new Date(now);
         
 
         if(now-date<43200000)

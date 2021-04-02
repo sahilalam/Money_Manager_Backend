@@ -279,7 +279,7 @@ app.get("/get_income/:from/:to",async(req,res)=>{
             }
             
         }
-        const data=await getIncomes(filter,decoded,email);
+        const data=await getIncomes(filter,decoded.email);
         res.status(200).json({
             data
         })

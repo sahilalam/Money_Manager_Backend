@@ -312,6 +312,22 @@ app.post('/add_income',async(req,res)=>{
     }
 })
 
+app.get('/check_update_income/:id',async(req,res)=>{
+    try{
+        let decoded=await jwt.verify(req.headers.authorization,process.env.KEY);
+        let check=await checkUpdateIncome(req.params.id);
+        res.status(200).json({
+            check
+        })
+    }
+    catch(err)
+    {
+        res.status(500).json({
+            message:err.message
+        })
+    }
+})
+
 app.put('/update_income',async(req,res)=>{
     try{
         let decoded=await jwt.verify(req.headers.authorization,process.env.KEY);
@@ -399,6 +415,21 @@ app.get('/get_expense/:from/:to/:category/:division',async(req,res)=>{
         const data=await getExpense(filter,decoded.email);
         res.status(200).json({
             data
+        })
+    }
+    catch(err)
+    {
+        res.status(500).json({
+            message:err.message
+        })
+    }
+})
+app.get('/check_update_expense/:id',async(req,res)=>{
+    try{
+        let decoded=await jwt.verify(req.headers.authorization,process.env.KEY);
+        let check=await checkUpdateExpense(req.params.id);
+        res.status(200).json({
+            check
         })
     }
     catch(err)

@@ -67,6 +67,7 @@ let getIncomes=async(filter,email)=>{
             {
                 to=new Date();
                 to=to.getTime() 
+                to=new Date(to);
                 to.setHours(to.getHours() + 5); 
                 to.setMinutes(to.getMinutes() + 30);
                 to=new Date(to);
@@ -77,7 +78,8 @@ let getIncomes=async(filter,email)=>{
         else
         {
             to=new Date();
-            to=to.getTime() 
+            to=to.getTime();
+            to=new Date(to);
             to.setHours(to.getHours() + 5); 
             to.setMinutes(to.getMinutes() + 30);
             to=new Date(to);

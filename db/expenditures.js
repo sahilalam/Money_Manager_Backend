@@ -65,7 +65,7 @@ let getExpense=async(filter)=>
             from=to-7776000000;
             from=new Date(from);
         }
-        let filter=[{
+        let f=[{
             "date":{
                 $lte:to,
                 $gte:from
@@ -73,17 +73,17 @@ let getExpense=async(filter)=>
         }];
         if(category)
         {
-            filter.push({
+            f.push({
                 "category":{$eq:category}
             });
         }
         if(division)
         {
-            filter.push({
+            f.push({
                 "division":{$eq:division}
             })
         }
-        const data=await db.collection(expenditures_collection).find({$and:filter}).sort({'date':-1}).toArray();
+        const data=await db.collection(expenditures_collection).find({$and:f}).sort({'date':-1}).toArray();
 
         client.close();
         return data;

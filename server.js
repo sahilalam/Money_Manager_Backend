@@ -279,7 +279,7 @@ app.get("/get_income/:from/:to",async(req,res)=>{
             }
             
         }
-        const data=await getIncomes(filter);
+        const data=await getIncomes(filter,decoded,email);
         res.status(200).json({
             data
         })
@@ -396,7 +396,7 @@ app.get('/get_expense/:from/:to/:category/:division',async(req,res)=>{
         {
             filter=null;
         }
-        const data=await getExpense(filter);
+        const data=await getExpense(filter,decoded.email);
         res.status(200).json({
             data
         })

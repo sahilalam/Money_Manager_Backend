@@ -4,7 +4,8 @@ const mongoClient=mongodb.MongoClient;
 const db_url=process.env.DB_URL;
 const db_name=process.env.DB_NAME;
 const expenditures_collection='expenditures';
-const {addExpenseUser} =require("./users.js")
+const objectId=mongodb.ObjectId;
+const {addExpenseUser,checkEmail} =require("./users.js")
 
 let addExpense=async(amount,description,division,category,email,date)=>{
     try{
@@ -22,12 +23,18 @@ let addExpense=async(amount,description,division,category,email,date)=>{
         throw err;
     }
 }
-let getExpense=async(filter)=>
+let getExpense=async(filter,email)=>
 {
     try{
         const client=await mongoClient.connect(db_url);
         const db=await client.db(db_name);
+        const data=await checkEmail(email);
+        let expenditures=data.expenditures;
+        expenditures=expenditures.map((id)=>{
+            return new objectId(id);
+        })
         let from,to,category=null,division=null;
+
         if(filter)
         {
             if(filter.from)
@@ -65,7 +72,13 @@ let getExpense=async(filter)=>
             from=to-7776000000;
             from=new Date(from);
         }
-        let f=[{
+        let f=[
+            {
+                "_id":{
+                    $in:expenditures
+                }
+            }
+            ,{
             "date":{
                 $lte:to,
                 $gte:from
@@ -83,6 +96,7 @@ let getExpense=async(filter)=>
                 "division":{$eq:division}
             })
         }
+
         const data=await db.collection(expenditures_collection).find({$and:f}).sort({'date':-1}).toArray();
 
         client.close();

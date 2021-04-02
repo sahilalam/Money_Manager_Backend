@@ -6,7 +6,7 @@ const db_name=process.env.DB_NAME;
 const incomes_collection='incomes';
 const objectId=mongodb.ObjectId;
 
-const {addIncomeUser}=require("./users.js");
+const {addIncomeUser,checkEmail}=require("./users.js");
 
 let addIncome=async(amount,description,email,date)=>{
     try{
@@ -24,10 +24,15 @@ let addIncome=async(amount,description,email,date)=>{
     }
 
 }
-let getIncomes=async(filter)=>{
+let getIncomes=async(filter,email)=>{
     try{
         const client=await mongoClient.connect(db_url);
         const db=await client.db(db_name);
+        const data=await checkEmail(email);
+        let incomes=data.incomes;
+        incomes=incomes.map((id)=>{
+            return new objectId(id);
+        })
         let from,to;
         if(filter)
         {
@@ -48,9 +53,9 @@ let getIncomes=async(filter)=>{
             from=to-7776000000;
             from=new Date(from);
         }
-        const data=await db.collection(incomes_collection).find({"date":{$lte:to,$gte:from}}).sort({'date':-1}).toArray();
+        const data=await db.collection(incomes_collection).find({$and:[{"_id":{$in:incomes}},{"date":{$lte:to,$gte:from}}]}).sort({'date':-1}).toArray();
         client.close();
-        return data;
+    return data;
     }
     catch(err)
     {

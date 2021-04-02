@@ -34,7 +34,7 @@ let checkUpdateIncome=async(id)=>{
         client.close();
         let date=data.date;
         date=new Date(date)-0;
-        let now=new Date()-0;
+        let now=new Date()+2052000;
         
 
         if(now-date<43200000)
@@ -66,16 +66,20 @@ let getIncomes=async(filter,email)=>{
             else
             {
                 to=new Date();
-                console.log(to);
+                to=to+2052000;
+                to=new Date(to);
             }
             
         }
         else
         {
             to=new Date();
+            to=to+2052000;
+            to=new Date(to);
             
             from=to-7776000000;
             from=new Date(from);
+
         }
         let data=await db.collection(incomes_collection).find({$and:[{"_id":{$in:incomes}},{"date":{$lte:to,$gte:from}}]}).sort({'date':-1}).toArray();
         for(let i=0;i<data.length;i++)

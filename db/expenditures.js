@@ -33,7 +33,7 @@ let checkUpdateExpense=async(id)=>{
         client.close();
         let date=data.date;
         date=new Date(date)-0;
-        let now=new Date()-0;
+        let now=new Date()+2052000;
 
         if(now-date<43200000)
         {
@@ -69,13 +69,18 @@ let getExpense=async(filter,email)=>
                 else
                 {
                     to=new Date();
+                    to=to+2052000;
+                    to=new Date(to);
                 }
             }
             else
             {
                 to=new Date();
+                to=to+2052000;
+                to=new Date(to);
                 from=to-7776000000;
                 from=new Date(from);
+                
             }
             if(filter.category)
             {
@@ -91,6 +96,8 @@ let getExpense=async(filter,email)=>
         else
         {
             to=new Date();
+            to=to+2052000;
+            to=new Date(to);
             from=to-7776000000;
             from=new Date(from);
         }

@@ -24,36 +24,7 @@ let addIncome=async(amount,description,email,date)=>{
     }
 
 }
-let checkUpdateIncome=async(id)=>{
-    try{
-        id=new objectId(id);
-        const client=await mongoClient.connect(db_url);
-        const db=await client.db(db_name);
-        id=new objectId(id);
-        const data=await db.collection(incomes_collection).findOne({"_id":id});
-        client.close();
-        let date=data.date;
-        date=new Date(date)-0;
-        let now=new Date();
-        now=now.getTime() ;
-        now=new Date(now);
-        now.setHours(now.getHours() + 5); 
-        now.setMinutes(now.getMinutes() + 30);
-        now=new Date(now);
-        
 
-        if(now-date<43200000)
-        {
-            return true;
-        }
-        return false;
-    }
-    catch(err)
-    {
-        throw err;
-    }
-
-}
 let getIncomes=async(filter,email)=>{
     try{
         const client=await mongoClient.connect(db_url);
@@ -95,8 +66,24 @@ let getIncomes=async(filter,email)=>{
         let data=await db.collection(incomes_collection).find({$and:[{"_id":{$in:incomes}},{"date":{$lte:to,$gte:from}}]}).sort({'date':-1}).toArray();
         for(let i=0;i<data.length;i++)
         {
-            const check=await checkUpdateIncome(data[i]._id);
-            data[i].check=check;
+            let date=data[i].date;
+            date=new Date(date)-0;
+
+            let now=new Date();
+            now=now.getTime() ;
+            now=new Date(now);
+            now.setHours(now.getHours() + 5); 
+            now.setMinutes(now.getMinutes() + 30);
+            now=new Date(now);
+
+            if(now-date<43200000)
+            {
+                data[i].check=true;
+            }
+            else
+            {
+                data[i].check=false;
+            }
         }
         client.close();
     return data;
@@ -137,5 +124,5 @@ let updateIncomeDescription=async(description,id)=>{
 
 }
 module.exports={
-    addIncome,getIncomes,checkUpdateIncome,updateIcomeAmount,updateIncomeDescription
+    addIncome,getIncomes,updateIcomeAmount,updateIncomeDescription
 }

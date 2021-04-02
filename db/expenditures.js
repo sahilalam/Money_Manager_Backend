@@ -23,35 +23,7 @@ let addExpense=async(amount,description,division,category,email,date)=>{
         throw err;
     }
 }
-let checkUpdateExpense=async(id)=>{
-    try{
-        id=new objectId(id);
-        const client=await mongoClient.connect(db_url);
-        const db=await client.db(db_name);
-        id=new objectId(id);
-        const data=await db.collection(expenditures_collection).findOne({"_id":id});
-        client.close();
-        let date=data.date;
-        date=new Date(date)-0;
-        let now=new Date();
-        now=now.getTime() ;
-        now=new Date(now);
-        now.setHours(now.getHours() + 5); 
-        now.setMinutes(now.getMinutes() + 30);
-        now=new Date(now);
 
-        if(now-date<43200000)
-        {
-            return true;
-        }
-        return false;
-    }
-    catch(err)
-    {
-        throw err;
-    }
-    
-}
 let getExpense=async(filter,email)=>
 {
     try{
@@ -143,8 +115,24 @@ let getExpense=async(filter,email)=>
         let data=await db.collection(expenditures_collection).find({$and:f}).sort({'date':-1}).toArray();
         for(let i=0;i<data.length;i++)
         {
-            const check=await checkUpdateExpense(data[i]._id);
-            data[i].check=check;
+            let date=data[i].date;
+            date=new Date(date)-0;
+
+            let now=new Date();
+            now=now.getTime() ;
+            now=new Date(now);
+            now.setHours(now.getHours() + 5); 
+            now.setMinutes(now.getMinutes() + 30);
+            now=new Date(now);
+            
+            if(now-date<43200000)
+            {
+                data[i].check=true;
+            }
+            else
+            {
+                data[i].check=false;
+            }
         }
         
         client.close();
@@ -222,5 +210,5 @@ let updateExpenseDivision=async(division,id)=>{
 
 }
 module.exports={
-    addExpense,updateExpenseAmount,updateExpenseCategory,updateExpenseDescription,updateExpenseDivision,checkUpdateExpense,getExpense
+    addExpense,updateExpenseAmount,updateExpenseCategory,updateExpenseDescription,updateExpenseDivision,getExpense
 }

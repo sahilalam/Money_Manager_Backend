@@ -47,8 +47,8 @@ app.use(express.urlencoded({extended:true}))
 
 
 const {checkEmail,addUser,login,checkUsername,updatePassword} =require('./db/users.js');
-const { addIncome,getIncomes,checkUpdateIncome,updateIcomeAmount,updateIncomeDescription }=require('./db/incomes.js');
-const {addExpense,updateExpenseAmount,updateExpenseCategory,updateExpenseDescription,updateExpenseDivision,checkUpdateExpense,getExpense}=require('./db/expenditures.js');
+const { addIncome,getIncomes,updateIcomeAmount,updateIncomeDescription }=require('./db/incomes.js');
+const {addExpense,updateExpenseAmount,updateExpenseCategory,updateExpenseDescription,updateExpenseDivision,getExpense}=require('./db/expenditures.js');
 
 app.post('/register',async(req,res)=>{
     try{
@@ -312,48 +312,22 @@ app.post('/add_income',async(req,res)=>{
     }
 })
 
-app.get('/check_update_income/:id',async(req,res)=>{
-    try{
-        let decoded=await jwt.verify(req.headers.authorization,process.env.KEY);
-        let check=await checkUpdateIncome(req.params.id);
-        res.status(200).json({
-            check
-        })
-    }
-    catch(err)
-    {
-        res.status(500).json({
-            message:err.message
-        })
-    }
-})
+
 
 app.put('/update_income',async(req,res)=>{
     try{
         let decoded=await jwt.verify(req.headers.authorization,process.env.KEY);
-        let check=await checkUpdateIncome(req.body.id);
-        if(check)
+        if(req.body.amount)
         {
-            if(req.body.amount)
-            {
-                await updateIcomeAmount(req.body.amount,req.body.id);
-            }
-            if(req.body.description)
-            {
-                await updateIncomeDescription(req.body.description,req.body.id);
-            }
-            res.status(201).json({
-                message:"Updated !!"
-            })
+            await updateIcomeAmount(req.body.amount,req.body.id);
         }
-        else
+        if(req.body.description)
         {
-            res.json({
-                message:"Your time to update this income is expired!"
-            })
+            await updateIncomeDescription(req.body.description,req.body.id);
         }
-        
-
+        res.status(201).json({
+            message:"Updated !!"
+        })
     }
     catch(err)
     {
@@ -424,55 +398,31 @@ app.get('/get_expense/:from/:to/:category/:division',async(req,res)=>{
         })
     }
 })
-app.get('/check_update_expense/:id',async(req,res)=>{
-    try{
-        let decoded=await jwt.verify(req.headers.authorization,process.env.KEY);
-        let check=await checkUpdateExpense(req.params.id);
-        res.status(200).json({
-            check
-        })
-    }
-    catch(err)
-    {
-        res.status(500).json({
-            message:err.message
-        })
-    }
-})
+
 
 app.put('/update_expense',async(req,res)=>{
     try{
         let decoded=await jwt.verify(req.headers.authorization,process.env.KEY);
-        let check=await checkUpdateExpense(req.body.id);
-        if(check)
-        {
-            if(req.body.amount)
-            {
-                await updateExpenseAmount(req.body.amount,req.body.id);
-            }
-            if(req.body.description)
-            {
-                await updateExpenseDescription(req.body.description,req.body.id);
-            }
-            if(req.body.category)
-            {
-                await updateExpenseCategory(req.body.category,req.body.id);
-            }
-            if(req.body.division)
-            {
-                await updateExpenseDivision(req.body.division,req.body.id);
-            }
-            res.status(201).json({
-                message:"Updated !!"
-            })
-        }
-        else
-        {
-            res.json({
-                message:"Your time to update this income is expired!"
-            })
-        }
         
+        if(req.body.amount)
+        {
+            await updateExpenseAmount(req.body.amount,req.body.id);
+        }
+        if(req.body.description)
+        {
+            await updateExpenseDescription(req.body.description,req.body.id);
+        }
+        if(req.body.category)
+        {
+            await updateExpenseCategory(req.body.category,req.body.id);
+        }
+        if(req.body.division)
+        {
+            await updateExpenseDivision(req.body.division,req.body.id);
+        }
+        res.status(201).json({
+            message:"Updated !!"
+        })        
 
     }
     catch(err)

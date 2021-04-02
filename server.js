@@ -378,10 +378,10 @@ app.get('/get_expense/:from/:to/:category/:division',async(req,res)=>{
         let filter={};
         if(from!=0)
         {
-            filter.from=from;
+            filter.from=new Date(from);
             if(to!=0)
             {
-                filter.to=to;
+                filter.to=new Date(to);
             }
         }
         if(category!=0)

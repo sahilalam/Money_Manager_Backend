@@ -271,12 +271,11 @@ app.get("/get_income/:from/:to",async(req,res)=>{
         if(from!=0)
         {
             filter={
-                from
-               
+                from:new Date(from)
             }
             if(to!=0)
             {
-                filter.to=to
+                filter.to=new Date(to)
             }
             
         }

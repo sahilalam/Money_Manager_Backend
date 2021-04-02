@@ -69,14 +69,18 @@ let getExpense=async(filter,email)=>
                 else
                 {
                     to=new Date();
-                    to=to+2052000;
+                    to=to.getTime() 
+                    to.setHours(to.getHours() + 5); 
+                    to.setMinutes(to.getMinutes() + 30);
                     to=new Date(to);
                 }
             }
             else
             {
                 to=new Date();
-                to=to+2052000;
+                to=to.getTime() 
+                to.setHours(to.getHours() + 5); 
+                to.setMinutes(to.getMinutes() + 30);
                 to=new Date(to);
                 from=to-7776000000;
                 from=new Date(from);
@@ -96,7 +100,9 @@ let getExpense=async(filter,email)=>
         else
         {
             to=new Date();
-            to=to+2052000;
+            to=to.getTime() 
+            to.setHours(to.getHours() + 5); 
+            to.setMinutes(to.getMinutes() + 30);
             to=new Date(to);
             from=to-7776000000;
             from=new Date(from);

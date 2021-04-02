@@ -76,7 +76,6 @@ let getIncomes=async(filter,email)=>{
                 to.setHours(to.getHours() + 5); 
                 to.setMinutes(to.getMinutes() + 30);
                 to=new Date(to);
-                console.log(to);
             }
             
         }
@@ -99,7 +98,6 @@ let getIncomes=async(filter,email)=>{
             const check=await checkUpdateIncome(data[i]._id);
             data[i].check=check;
         }
-        console.log(data);
         client.close();
     return data;
     }

@@ -66,8 +66,10 @@ let getIncomes=async(filter,email)=>{
             else
             {
                 to=new Date();
+                console.log(to)
                 to=to+2052000;
                 to=new Date(to);
+                console.log(to);
             }
             
         }

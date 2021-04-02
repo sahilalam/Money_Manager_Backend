@@ -28,8 +28,8 @@ let getIncomes=async(filter,email)=>{
     try{
         const client=await mongoClient.connect(db_url);
         const db=await client.db(db_name);
-        const data=await checkEmail(email);
-        let incomes=data.incomes;
+        const user=await checkEmail(email);
+        let incomes=user.incomes;
         incomes=incomes.map((id)=>{
             return new objectId(id);
         })

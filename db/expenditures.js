@@ -28,8 +28,8 @@ let getExpense=async(filter,email)=>
     try{
         const client=await mongoClient.connect(db_url);
         const db=await client.db(db_name);
-        const data=await checkEmail(email);
-        let expenditures=data.expenditures;
+        const user=await checkEmail(email);
+        let expenditures=user.expenditures;
         expenditures=expenditures.map((id)=>{
             return new objectId(id);
         })

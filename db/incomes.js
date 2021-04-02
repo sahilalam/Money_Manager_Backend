@@ -26,13 +26,16 @@ let addIncome=async(amount,description,email,date)=>{
 }
 let checkUpdateIncome=async(id)=>{
     try{
+        id=new objectId(id);
         const client=await mongoClient.connect(db_url);
         const db=await client.db(db_name);
         id=new objectId(id);
         const data=await db.collection(incomes_collection).findOne({"_id":id});
         client.close();
-        const date=data.date;
-        let now=new Date();
+        let date=data.date;
+        date=new Date(date)-0;
+        let now=new Date()-0;
+        
 
         if(now-date<43200000)
         {
@@ -73,19 +76,12 @@ let getIncomes=async(filter,email)=>{
             from=new Date(from);
         }
         let data=await db.collection(incomes_collection).find({$and:[{"_id":{$in:incomes}},{"date":{$lte:to,$gte:from}}]}).sort({'date':-1}).toArray();
-        data=data.map(async(d)=>{
-            try{
-                let result={...d};
-                const check=await checkUpdateIncome(d._id);
-                result.check=check;
-                return result;
-            }
-            catch(err)
-            {
-                throw err;
-                console.log(err);
-            }
-        })
+        for(let i=0;i<data.length;i++)
+        {
+            const check=await checkUpdateIncome(data[i]._id);
+            data[i].check=check;
+        }
+        console.log(data);
         client.close();
     return data;
     }

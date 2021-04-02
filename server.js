@@ -265,8 +265,8 @@ app.get('/verify_token&get_user_details',async(req,res)=>{
 app.get("/get_income/:from/:to",async(req,res)=>{
     try{
         let decoded=await jwt.verify(req.headers.authorization,process.env.KEY);
-        let from=req.params.from;
-        let to=req.params.to;
+        let from=+req.params.from;
+        let to=+req.params.to;
         let filter=null;
         if(from!=0)
         {
@@ -371,8 +371,8 @@ app.post('/add_expense',async(req,res)=>{
 app.get('/get_expense/:from/:to/:category/:division',async(req,res)=>{
     try{
         let decoded=await jwt.verify(req.headers.authorization,process.env.KEY)
-        let from=req.params.from;
-        let to=req.params.to;
+        let from=+req.params.from;
+        let to=+req.params.to;
         let category=req.params.category;
         let division=req.params.division;
         let filter={};

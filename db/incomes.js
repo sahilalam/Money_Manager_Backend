@@ -35,9 +35,20 @@ let getIncomes=async(filter,email)=>{
         if(filter)
         {
             from=filter.from;
+            from=from.getTime() 
+            from=new Date(from);
+            from.setHours(from.getHours() + 5); 
+            from.setMinutes(from.getMinutes() + 30);
+            from=new Date(from);
+
             if(filter.to)
             {
-                to=filter.to;   
+                to=filter.to;
+                to=to.getTime() 
+                to=new Date(to);
+                to.setHours(to.getHours() + 5); 
+                to.setMinutes(to.getMinutes() + 30);
+                to=new Date(to);
             }
             else
             {

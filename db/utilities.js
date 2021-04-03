@@ -7,4 +7,6 @@ let convertToIst=(date)=>{
     return date;
 
 }
-export default convertToIst;
+module.exports={
+    convertToIst
+}

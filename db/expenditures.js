@@ -5,7 +5,8 @@ const db_url=process.env.DB_URL;
 const db_name=process.env.DB_NAME;
 const expenditures_collection='expenditures';
 const objectId=mongodb.ObjectId;
-const {addExpenseUser,checkEmail} =require("./users.js")
+const {addExpenseUser,checkEmail} =require("./users.js");
+const {convertToIst}=require('./utilities.js');
 
 let addExpense=async(amount,description,division,category,email,date)=>{
     try{
@@ -39,30 +40,25 @@ let getExpense=async(filter,email)=>
             if(filter.from)
             {
                 from=filter.from;
+                from=convertToIst(from);
                 if(filter.to)
                 {
-                    to=filter.to
+                    to=filter.to;
+                    to=convertToIst(to);
                 }
                 else
                 {
                     to=new Date();
-                    to=to.getTime() ;
-                    to=new Date(to);
-                    to.setHours(to.getHours() + 5); 
-                    to.setMinutes(to.getMinutes() + 30);
-                    to=new Date(to);
+                    to=convertToIst(to);
                 }
             }
             else
             {
                 to=new Date();
-                to=to.getTime() ;
-                to=new Date(to);
-                to.setHours(to.getHours() + 5); 
-                to.setMinutes(to.getMinutes() + 30);
-                to=new Date(to);
+                to=convertToIst(to);
                 from=to-7776000000;
                 from=new Date(from);
+                from=convertToIst(from);
                 
             }
             if(filter.category)
@@ -79,13 +75,10 @@ let getExpense=async(filter,email)=>
         else
         {
             to=new Date();
-            to=to.getTime() ;
-            to=new Date(to);
-            to.setHours(to.getHours() + 5); 
-            to.setMinutes(to.getMinutes() + 30);
-            to=new Date(to);
+            to=convertToIst(to);
             from=to-7776000000;
             from=new Date(from);
+            from=convertToIst(from);
         }
         let f=[
             {
@@ -119,11 +112,7 @@ let getExpense=async(filter,email)=>
             date=new Date(date)-0;
 
             let now=new Date();
-            now=now.getTime() ;
-            now=new Date(now);
-            now.setHours(now.getHours() + 5); 
-            now.setMinutes(now.getMinutes() + 30);
-            now=new Date(now);
+            now=convertToIst(now)
             
             if(now-date<43200000)
             {

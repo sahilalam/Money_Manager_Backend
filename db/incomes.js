@@ -7,6 +7,7 @@ const incomes_collection='incomes';
 const objectId=mongodb.ObjectId;
 
 const {addIncomeUser,checkEmail}=require("./users.js");
+const {convertToIst}=require('./utilities.js');
 
 let addIncome=async(amount,description,email,date)=>{
     try{
@@ -35,43 +36,29 @@ let getIncomes=async(filter,email)=>{
         if(filter)
         {
             from=filter.from;
-            from=from.getTime() 
-            from=new Date(from);
-            from.setHours(from.getHours() + 5); 
-            from.setMinutes(from.getMinutes() + 30);
-            from=new Date(from);
+            from=convertToIst(from);
 
             if(filter.to)
             {
                 to=filter.to;
-                to=to.getTime() 
-                to=new Date(to);
-                to.setHours(to.getHours() + 5); 
-                to.setMinutes(to.getMinutes() + 30);
-                to=new Date(to);
+                to=convertToIst(to);
             }
             else
             {
                 to=new Date();
-                to=to.getTime() 
-                to=new Date(to);
-                to.setHours(to.getHours() + 5); 
-                to.setMinutes(to.getMinutes() + 30);
-                to=new Date(to);
+                to=convertToIst(to);
             }
             
         }
         else
         {
             to=new Date();
-            to=to.getTime();
-            to=new Date(to);
-            to.setHours(to.getHours() + 5); 
-            to.setMinutes(to.getMinutes() + 30);
-            to=new Date(to);
+            to=convertToIst(to);
             
             from=to-7776000000;
             from=new Date(from);
+            from=convertToIst(from);
+            
 
         }
         let data=await db.collection(incomes_collection).find({$and:[{"_id":{$in:incomes}},{"date":{$lte:to,$gte:from}}]}).sort({'date':-1}).toArray();
@@ -81,11 +68,7 @@ let getIncomes=async(filter,email)=>{
             date=new Date(date)-0;
 
             let now=new Date();
-            now=now.getTime() ;
-            now=new Date(now);
-            now.setHours(now.getHours() + 5); 
-            now.setMinutes(now.getMinutes() + 30);
-            now=new Date(now);
+            now=convertToIst(now);
 
             if(now-date<43200000)
             {

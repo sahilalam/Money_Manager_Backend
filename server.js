@@ -57,7 +57,7 @@ app.post('/register',async(req,res)=>{
         if(check)
         {
             console.log("exists")
-            res.json({
+            res.status(400).json({
                 message:"User Already Exists!"
             })
         }
@@ -119,7 +119,7 @@ app.post('/register/:encrypted_mail',async(req,res)=>{
         }
         else
         {
-            res.status(500).json({
+            res.status(400).json({
                 message:"Either Username or password is empty!"
             });
         }  
@@ -128,7 +128,7 @@ app.post('/register/:encrypted_mail',async(req,res)=>{
     catch(err)
     {
         console.log(err);
-        res.status(404).json({
+        res.status(500).json({
             message:err.message
         });
     }
@@ -159,7 +159,7 @@ app.post('/login',async(req,res)=>{
             }
             else
             {
-                res.status(404).json({
+                res.status(400).json({
                     message:"Invalid Password"
                 })   
             }
@@ -205,7 +205,7 @@ app.post('/forgot_password',async(req,res)=>{
         else
         {
             res.status(404).json({
-                message:"No user fornd with this e-mail"
+                message:"No user found with this e-mail"
             })
         }
 
